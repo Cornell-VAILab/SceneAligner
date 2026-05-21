@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="SceneAligner: 3D-Grounded Floorplan Localization in the Wild">
+  <meta name="keywords" content="SceneAligner, floorplan localization, 3D scene reconstruction, floorplan alignment, in the wild">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SceneAligner</title>
+  <link rel="icon" type="image/png" href="./static/images/logo.png">
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+</head>
+<body>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-2 is-size-3-mobile publication-title">SceneAligner: 3D-Grounded <br class="is-hidden-mobile"> Floorplan Localization in the Wild</h1>
+            <div class="is-size-5 publication-authors" style="margin-top:-8px">
+            <span class="author-block" style="margin-right:12px">
+              <a href="https://jhcho99.github.io/">Junhyeong Cho</a><sup>1</sup>
+            </span>
+            <span class="author-block" style="margin-right:12px">
+              <a href="https://ruojincai.github.io/">Ruojin Cai</a><sup>2</sup>
+            </span>
+            <span class="author-block">
+              <a href="https://www.hadarelor.com/">Hadar Averbuch-Elor</a><sup>1</sup>
+            </span>
+          </div>
+          <div class="is-size-5 is-size-6-mobile publication-authors" style="margin-top:8px">
+              <ul class="affiliation-list">
+                  <li class="affiliation">
+                      <img src="./static/images/cornell.png" alt="Cornell Logo" class="logo" />
+                      <span class="author-block"><sup>1</sup>Cornell University</span>
+                  </li>
+                  <li class="affiliation">
+                      <img src="./static/images/harvard.jpg" alt="Harvard Logo" class="logo" />
+                      <span class="author-block"><sup>2</sup>Kempner Institute, Harvard University</span>
+                  </li>
+              </ul>
+          </div>
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://arxiv.org/pdf/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/..."
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/Cornell-VAILab"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a href="#Visualization"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-vr-cardboard"></i>
+                  </span>
+                  <span>Visualization</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a href="#BibTeX"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-obp"></i>
+                  </span>
+                  <span>BibTeX</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser" style="margin-top:-40px">
+  <div class="container is-max-desktop">
+    <h2 class="subtitle has-text-justified" style="font-size:1rem">
+      <div class="gray-box-custom">
+        <span style="background:#6c757d; color:#ffffff; padding:1.5px 10px; border-radius:6px; font-size:0.8em; font-weight:bold; letter-spacing:0.03em; vertical-align:middle; margin-right:3px">TL;DR</span> Our method localizes in-the-wild photos within a reference floorplan by reconstructing a gravity-aligned 3D scene and aligning it with the floorplan.
+      </div>
+    </h2>
+    <div class="hero-body" style="margin-top:20px">
+      <video src="static/videos/teaser.mp4" autoplay loop muted playsinline class="center"></video>
+    </div>
+    <p class="content has-text-justified" style="margin-top:-10px">
+      Given a collection of in-the-wild images and a rasterized floorplan, <b>SceneAligner</b> reconstructs a gravity-aligned 3D point cloud from the images and globally aligns this reconstruction to the 2D floorplan map, thereby localizing the images within the floorplan. As illustrated above, our approach successfully aligns images capturing large-scale 3D environments, including exterior scenes (Doddabasappa Temple, left) and interior spaces (Église Saint-Martin d’Agonac, right).
+    </p>
+  </div>
+</section>
+
+
+<hr>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered" style="margin-top:-5px">Abstract</h2>
+    <div class="content has-text-justified">
+      <p>
+        Many public buildings provide floorplans with a “you are here” indicator to help visitors orient themselves. Floorplan localization seeks to computationally replicate this capability by determining where visual observations were captured within a floorplan. However, existing methods typically assume controlled small-scale environments and precise vectorized floorplans, limiting their ability to operate in large-scale buildings and rasterized floorplans. In this work, we present an approach for performing floorplan localization in the wild by grounding the task in a reconstructed 3D representation of the scene. Given an unconstrained image collection, our method reconstructs a gravity-aligned 3D scene and projects it into a 2D density map that serves as a floorplan proxy. Floorplan localization is then formulated as aligning this proxy with the input floorplan via a 2D similarity transform. To bridge the appearance gap between density maps and architectural floorplans, we adapt a 2D foundation model to learn cross-modal correspondences, introducing a fine-tuning scheme that encourages semantically aligned matches while preserving structural consistency. Extensive experiments demonstrate substantial improvements over prior methods, including in extremely sparse settings with as little as a single input image. Our code and data will be publicly available.
+      </p>
+    </div>
+  </div>
+</section>
+<br>
+
+
+<hr>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered" style="margin-top:-5px">Method Overview</h2>
+  </div>
+</section>
+<section class="hero teaser" style="margin-top:20px">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/Figure2.png" class="center-img"/>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="content has-text-justified" style="margin-top:-22px">
+      <p style="margin-top:20px">
+        Given in-the-wild images and a floorplan, SceneAligner reconstructs a gravity-aligned 3D scene, extracts a 2D density map via projection, and solves for a 2D similarity transform &#x1D40C; via correspondence estimation between the density map and floorplan using a shared encoder. Reliable correspondences used to compute &#x1D40C; are overlaid (in <span style="color: #E86301;">orange</span>) on the aligned density map.
+      </p>
+    </div>
+  </div>
+</section>
+<div class="container is-max-desktop">
+  <div class="has-text-centered" style="margin-top:10px">
+    <button id="method-video-btn"
+                class="button is-normal is-rounded is-dark"
+                onclick="var s=document.getElementById('method-video');
+                         var v=s.querySelector('video');
+                         var hidden=(s.style.display==='none');
+                         if (hidden) {
+                           s.style.display='';
+                           v.play();
+                           this.classList.add('is-outlined');
+                         } else {
+                           v.pause();
+                           s.style.display='none';
+                           this.classList.remove('is-outlined');
+                         }
+                         this.blur();">
+          <span class="icon"><i class="fas fa-play"></i></span>
+      <span>Click here to see 360° view rendering</span>
+    </button>
+  </div>
+</div>
+<section id="method-video" class="hero teaser"
+         style="margin-top:20px; margin-bottom:-60px; display:none">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <video src="static/videos/method_overview_large.mp4"
+             loop muted playsinline class="center"></video>
+    </div>
+  </div>
+</section>
+<br>
+
+<hr>
+<section class="section" style="padding-bottom:0">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered" style="margin-top:-5px">Experimental Results</h2>
+  </div>
+</section>
+<section class="hero teaser" style="margin-top:20px">
+  <div class="container is-max-desktop">
+    <div style="display:flex; gap:16px">
+      <div style="flex:1; min-width:0; text-align:center">
+        <video src="static/videos/source/overview_exp/S503-I-F1_360_turntable.mp4"
+               autoplay loop muted playsinline
+               style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+        <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">Interior 3D Scene</span>
+      </div>
+      <div style="flex:1; min-width:0; text-align:center">
+        <video src="static/videos/source/overview_exp/S520-E-F1_360_turntable.mp4"
+               autoplay loop muted playsinline
+               style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+        <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">Exterior 3D Scene</span>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="content has-text-justified" style="margin-top:-18px">
+      <p style="margin-top:15px">
+        <b>Floorplan-aligned 3D Scene Reconstructions.</b> Our method effectively aligns in-the-wild 3D scene reconstructions with their corresponding floorplans.
+      </p>
+    </div>
+  </div>
+</section>
+<br>
+<section class="hero teaser" style="margin-top:10px; margin-bottom:20px" id="Visualization">
+  <div class="container is-max-desktop">
+    <div style="background:#fafafa; border:2px solid #ddd; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+      <div style="background:#495057; color:#ffffff; padding:12px 15px; border-radius:8px; text-align:center; font-weight:bold; font-size:1.4em; margin-bottom:15px">360° View Renderings of Floorplan-Aligned Scenes</div>
+      <div class="buttons is-centered" style="margin-bottom:14px">
+        <button id="results-btn-all"
+                class="button is-rounded is-dark is-outlined"
+                onclick="resultsSetView('all')">
+          <span class="icon"><i class="fas fa-play"></i></span>
+          <span>All</span>
+        </button>
+        <button id="results-btn-each"
+                class="button is-rounded is-dark"
+                onclick="resultsSetView('each')">
+          <span class="icon"><i class="fas fa-play"></i></span>
+          <span>Each</span>
+        </button>
+        <span aria-hidden="true" class="is-hidden-mobile" style="display:inline-block; width:2px; align-self:stretch; background:#bbb; margin:0 20px"></span>
+        <button id="results-btn-cmp"
+                class="button is-rounded is-dark"
+                onclick="resultsSetView('cmp')">
+          <span class="icon"><i class="fas fa-play"></i></span>
+          <span>Comparison</span>
+        </button>
+      </div>
+      <div id="results-all">
+        <video id="results-all-video" data-src="static/videos/grid_4x5.mp4" preload="none"
+               loop muted playsinline class="center"
+               style="border:1px solid #ccc; border-radius:8px; background:#000"></video>
+      </div>
+      <div id="results-each" style="display:none">
+        <video id="results-each-video" loop muted playsinline class="center"
+               style="border:1px solid #ccc; border-radius:8px; background:#fff"></video>
+        <div id="results-each-scene" style="text-align:center; color:#495057; font-size:1.1em; margin-top:14px"><span style="color:#8a8f94; font-weight:600">|&nbsp;Scene&nbsp;|&nbsp;</span><b>All saints church (Stvolínky)</b></div>
+        <div style="margin-top:14px; display:flex; align-items:center; justify-content:center; gap:18px;">
+          <button class="button is-rounded is-dark"
+                  onclick="resultsEachStep(-1)" aria-label="Previous">
+            <span class="icon"><i class="fas fa-caret-left"></i></span>
+          </button>
+          <span id="results-each-counter" style="font-size:1.1rem; min-width:60px; text-align:center">1 / 20</span>
+          <button class="button is-rounded is-dark"
+                  onclick="resultsEachStep(1)" aria-label="Next">
+            <span class="icon"><i class="fas fa-caret-right"></i></span>
+          </button>
+        </div>
+      </div>
+      <div id="results-cmp" style="display:none">
+        <p style="text-align:center; color:#495057; line-height:1.6; margin:0 auto 14px auto;">
+          We compare results obtained using correspondences estimated by the <strong>pretrained DINOv3</strong> and by our <strong>fine-tuned model</strong>. The pretrained DINOv3 baseline shares the same inference pipeline, isolating the contribution of our adaptation scheme.
+        </p>
+        <div style="display:flex; gap:16px">
+          <div style="flex:1; min-width:0; text-align:center">
+            <video id="results-cmp-video-dinov3" loop muted playsinline
+                   style="width:100%; border:1px solid #ccc; border-radius:8px; background:#fff"></video>
+            <span style="display:block; font-weight:bold; font-size:1.15em; margin-top:8px; color:#495057">Pretrained Model (DINOv3)</span>
+          </div>
+          <div style="flex:1; min-width:0; text-align:center">
+            <video id="results-cmp-video-ours" loop muted playsinline
+                   style="width:100%; border:1px solid #ccc; border-radius:8px; background:#fff"></video>
+            <span style="display:block; font-weight:bold; font-size:1.15em; margin-top:8px; color:#495057">Fine-tuned Model (Ours)</span>
+          </div>
+        </div>
+        <div id="results-cmp-scene" style="text-align:center; color:#495057; font-size:1.1em; margin-top:14px"><span style="color:#8a8f94; font-weight:600">|&nbsp;Scene&nbsp;|&nbsp;</span><b>All saints church (Stvolínky)</b></div>
+        <div style="margin-top:14px; display:flex; align-items:center; justify-content:center; gap:18px;">
+          <button class="button is-rounded is-dark"
+                  onclick="resultsCmpStep(-1)" aria-label="Previous">
+            <span class="icon"><i class="fas fa-caret-left"></i></span>
+          </button>
+          <span id="results-cmp-counter" style="font-size:1.1rem; min-width:60px; text-align:center">1 / 20</span>
+          <button class="button is-rounded is-dark"
+                  onclick="resultsCmpStep(1)" aria-label="Next">
+            <span class="icon"><i class="fas fa-caret-right"></i></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  window.SCENE_NAMES = {"S003-E-F1": "Abbaye de Chaalis - Abbatiale", "S013-E-F3": "All Saints, Brixworth", "S014-E-F1": "All saints church (Stvolínky)", "S028-E-F1": "Basilica (Pompeii)", "S029-E-F1": "Basilica St. Castor (Koblenz)", "S038-I-F1": "Basilique Saint-Martin d'Ainay (Lyon)", "S047-I-F1": "Birnau", "S057-E-F1": "Bristol Hotel", "S068-E-F3": "Castillo de la Atalaya", "S081-E-F1": "Cathedral of Palencia", "S085-I-F1": "Cathedral of St Eufemia (Grado)", "S086-E-F1": "Cathedral of la Seu d'Urgell", "S088-I-F1": "Cathédrale Notre-Dame d'Amiens", "S094-E-F1": "Cathédrale Saint-Corentin de Quimper", "S095-I-F1": "Cathédrale Saint-Cyr-et-Sainte-Julitte de Nevers", "S110-E-F1": "Cathédrale Saint-Étienne de Limoges", "S116-E-F1": "Chalukya Shiva Temple", "S119-E-F1": "Chapelle Notre-Dame du Kreisker", "S121-E-F1": "Chapelle de Languidou", "S122-E-F1": "Chiesa degli Ottimati", "S123-I-F1": "Chiesa del Gesù (Rome)", "S125-E-F1": "Chiswick House", "S137-E-F1": "Church of Saint Giles in Nymburk", "S139-E-F1": "Church of Saint James (Libiš)", "S141-E-F1": "Church of Saint John the Baptist in Vysoká", "S143-E-F1": "Church of Saint Martin of Tours, Frómista", "S150-E-F1": "Church of Saints Peter and Paul (Dolní Lukavice)", "S152-E-F1": "Church of San Juan de Puerta Nueva, Zamora", "S162-E-F1": "Church of Santiago de Peñalba", "S164-E-F1": "Church of St. Donatus in Zadar", "S167-E-F1": "Church of the Assumption, Tamajón", "S168-E-F1": "Church of the Assumption of the Virgin Mary (Charvatce)", "S173-I-F1": "Church of the Visitation of Our Lady (Borovany)", "S183-I-F1": "Cologne Cathedral", "S184-E-F1": "Convent of Santo Domingo, Pontevedra", "S186-E-F1": "Doddabasappa Temple", "S189-E-F1": "Dominicanenkerk (Maastricht)", "S204-I-F1": "Ekeby kyrka, Gotland", "S208-E-F1": "Església de la Doma", "S211-E-F1": "Exeter Cathedral", "S211-I-F1": "Exeter Cathedral", "S220-I-F1": "Fridolinsmünster Bad Säckingen", "S221-E-F1": "Friedrichswerdersche Kirche", "S221-I-F1": "Friedrichswerdersche Kirche", "S231-E-F1": "Grossmünster", "S237-I-F1": "Hagia Sophia", "S256-E-F1": "Iglesia de Orosi", "S258-E-F1": "Igreja de São Domingos (Elvas)", "S259-E-F1": "Indal Deul temple, Kharod", "S260-I-F1": "Jaca Cathedral", "S262-E-F1": "Jesuitenkirche Mannheim", "S263-E-F1": "Kabuki-za", "S265-E-F1": "Kapelle 13 (Friedhof Ohlsdorf)", "S279-E-F1": "Leeds Parish Church", "S291-E-F1": "Macellum (Pompeii)", "S294-I-F1": "Manchester Cathedral", "S300-I-F1": "Mariä Himmelfahrt, Schwaz", "S302-E-F1": "Marktkirche (Paderborn)", "S303-E-F1": "Marktkirche (Wiesbaden)", "S310-E-F1": "Mezhyrich Monastery", "S315-I-F1": "Monestir de Sant Benet de Bages", "S323-E-F1": "Muhammad Mosque (Baku)", "S324-E-F1": "Museum für Kunst und Gewerbe", "S333-E-F1": "Opéra Garnier", "S334-I-F1": "Orsanmichele", "S343-I-F1": "Palais de justice de Paris", "S350-E-F1": "Palácio Nacional da Ajuda", "S356-E-F1": "Petrikirche (Dortmund)", "S358-I-F1": "Pfarrkirche Mariä Himmelfahrt (Hallstatt)", "S365-E-F1": "Pilgrimage Church of Saint John of Nepomuk", "S366-E-F1": "Pitsunda Cathedral", "S374-I-F1": "Regensburg Cathedral", "S375-I-F1": "Reims Cathedral", "S377-E-F1": "Riddarholmskyrkan", "S378-E-F1": "Rideau Hall", "S382-E-F1": "Rotunda of St. Marija Assunta", "S386-E-F1": "Saint-André church in Saint-André (Pyrénées-Orientales)", "S396-E-F1": "Saint Onuphrius church, Lviv", "S397-E-F1": "Saint Sophia Cathedral (Vologda)", "S403-I-F1": "San Biagio (Montepulciano)", "S407-I-F1": "San Clemente (Rome)", "S419-E-F1": "Sanguszko Palace (Iziaslav)", "S422-E-F1": "Sant'Ambrogio (Milan)", "S425-I-F1": "Sant'Angelo (Perugia)", "S428-E-F1": "Sant'Ivo alla Sapienza (Rome)", "S434-I-F1": "Santa Maria Maggiore (Rome)", "S443-I-F1": "Santa Maria delle Grazie (Grado)", "S448-E-F1": "Santi Pietro e Paolo d'Agrò (San Pietro, Casalvecchio Siculo)", "S460-E-F1": "Shore Temple", "S480-E-F1": "St. Maria Magdalena und St. Andreas (Knechtsteden)", "S486-I-F1": "St. Nikolaikirche (Potsdam)", "S490-E-F1": "St. Sebald (Nürnberg)", "S496-E-F1": "St Magnus Cathedral, Kirkwall", "S496-I-F1": "St Magnus Cathedral, Kirkwall", "S498-E-F1": "St Michael and All Angels, Hawkshead", "S500-E-F1": "St Wulfram's, Grantham", "S501-E-F1": "St Wynwallow's Church, Landewednack", "S503-I-F1": "Stanford Memorial Church", "S507-E-F1": "Svetitskhoveli", "S511-E-F1": "Targmanchats church of Parpi", "S518-E-F1": "Temple Church, London", "S520-E-F1": "Temple du Marais", "S522-E-F1": "Temple of Concordia (Agrigento)", "S526-E-F1": "Temple of Mars the Avenger, Rome", "S528-E-F1": "Temple of Poseidon (Paestum)", "S541-E-F1": "Villa Reale (Milan)", "S545-E-F1": "Vår Frue kirke (Trondheim)", "S550-E-F1": "Wedding Church (Catholic)", "S561-E-F1": "Zvartnots", "S564-I-F1": "Église Notre-Dame-de-l'Assomption d'Anzy-le-Duc", "S570-E-F1": "Église Notre-Dame de La Souterraine", "S577-E-F1": "Église Saint-Léonce de Saint-Léon-sur-Vézère", "S579-I-F1": "Église Saint-Martin d'Agonac", "S580-I-F1": "Église Saint-Martin de Vic"};
+  window.sceneDisplayName = function (id) {
+    return (window.SCENE_NAMES && window.SCENE_NAMES[id]) || id;
+  };
+  window.sceneCaptionHTML = function (id) {
+    return '<span style="color:#8a8f94; font-weight:600">|&nbsp;Scene&nbsp;|&nbsp;</span>'
+         + '<b>' + window.sceneDisplayName(id) + '</b>';
+  };
+</script>
+<script>
+  (function () {
+    var FILES = [
+      "S014-E-F1_00000_9_360_turntable.mp4",
+      "S057-E-F1_00000_52_360_turntable.mp4",
+      "S088-I-F1_00000_88_360_turntable.mp4",
+      "S116-E-F1_00000_15_360_turntable.mp4",
+      "S123-I-F1_00000_103_360_turntable.mp4",
+      "S152-E-F1_00000_41_360_turntable.mp4",
+      "S164-E-F1_00001_77_360_turntable.mp4",
+      "S211-E-F1_00000_102_360_turntable.mp4",
+      "S221-E-F1_00000_69_360_turntable.mp4",
+      "S237-I-F1_00000_148_360_turntable.mp4",
+      "S300-I-F1_00000_37_360_turntable.mp4",
+      "S323-E-F1_00000_9_360_turntable.mp4",
+      "S374-I-F1_00000_91_360_turntable.mp4",
+      "S396-E-F1_00000_13_360_turntable.mp4",
+      "S419-E-F1_00000_11_360_turntable.mp4",
+      "S428-E-F1_00000_77_360_turntable.mp4",
+      "S486-I-F1_00000_66_360_turntable.mp4",
+      "S496-E-F1_00000_85_360_turntable.mp4",
+      "S518-E-F1_00000_94_360_turntable.mp4",
+      "S564-I-F1_00000_19_360_turntable.mp4"
+    ];
+    var OURS_BASE = "static/videos/source/ours/";
+    var DINOV3_BASE = "static/videos/source/dinov3/";
+
+    var eachIdx = 0, cmpIdx = 0;
+
+    var _pcache = [];
+    function preloadVideo(url) {
+      if (!url) return;
+      for (var j = 0; j < _pcache.length; j++) if (_pcache[j].url === url) return;
+      var pv = document.createElement('video');
+      pv.preload = 'auto'; pv.muted = true; pv.src = url; pv.load();
+      _pcache.push({ url: url, el: pv });
+      while (_pcache.length > 6) {
+        var old = _pcache.shift();
+        old.el.removeAttribute('src');
+        old.el.load();
+      }
+    }
+    function _eachUrl(i) {
+      return OURS_BASE + FILES[(i + FILES.length) % FILES.length];
+    }
+    function _cmpUrls(i) {
+      var k = (i + FILES.length) % FILES.length;
+      return [DINOV3_BASE + FILES[k], OURS_BASE + FILES[k]];
+    }
+
+    function lockSize(el) {
+      if (el && el.clientHeight > 1) {
+        var r = el.getBoundingClientRect();
+        el.style.height = r.height + 'px';
+        el.style.width  = r.width  + 'px';
+      }
+    }
+    ['results-each-video', 'results-cmp-video-dinov3', 'results-cmp-video-ours']
+      .forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('loadeddata', function () {
+          el.style.height = ''; el.style.width = '';
+        });
+      });
+
+    function setEach(i) {
+      eachIdx = (i + FILES.length) % FILES.length;
+      var v = document.getElementById('results-each-video');
+      lockSize(v);
+      v.src = OURS_BASE + FILES[eachIdx];
+      v.play();
+      document.getElementById('results-each-counter').textContent =
+        (eachIdx + 1) + ' / ' + FILES.length;
+      document.getElementById('results-each-scene').innerHTML =
+        window.sceneCaptionHTML(FILES[eachIdx].split('_')[0]);
+      preloadVideo(_eachUrl(eachIdx + 1));
+      preloadVideo(_eachUrl(eachIdx - 1));
+    }
+    function setCmp(i) {
+      cmpIdx = (i + FILES.length) % FILES.length;
+      var d = document.getElementById('results-cmp-video-dinov3');
+      var o = document.getElementById('results-cmp-video-ours');
+      lockSize(d); lockSize(o);
+      d.src = DINOV3_BASE + FILES[cmpIdx];
+      o.src = OURS_BASE + FILES[cmpIdx];
+      d.play(); o.play();
+      document.getElementById('results-cmp-counter').textContent =
+        (cmpIdx + 1) + ' / ' + FILES.length;
+      document.getElementById('results-cmp-scene').innerHTML =
+        window.sceneCaptionHTML(FILES[cmpIdx].split('_')[0]);
+      _cmpUrls(cmpIdx + 1).forEach(function (u) { preloadVideo(u); });
+      _cmpUrls(cmpIdx - 1).forEach(function (u) { preloadVideo(u); });
+    }
+    function blurActive() {
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    }
+
+    window.resultsEachStep = function (d) { setEach(eachIdx + d); blurActive(); };
+    window.resultsCmpStep  = function (d) { setCmp(cmpIdx + d); blurActive(); };
+
+    var gridLoaded = false;
+    function ensureGridLoaded() {
+      if (gridLoaded) return;
+      var g = document.getElementById('results-all-video');
+      if (!g || !g.dataset.src) return;
+      gridLoaded = true;
+      g.src = g.dataset.src;
+      g.load();
+      var pr = g.play();
+      if (pr && pr.catch) pr.catch(function () {});
+    }
+    (function () {
+      var g = document.getElementById('results-all-video');
+      if (!g) return;
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { ensureGridLoaded(); io.disconnect(); }
+          });
+        }, { rootMargin: '1200px 0px' });
+        io.observe(g);
+      } else {
+        ensureGridLoaded();
+      }
+    })();
+
+    window.resultsSetView = function (which) {
+      var views = {
+        all: document.getElementById('results-all'),
+        each: document.getElementById('results-each'),
+        cmp: document.getElementById('results-cmp')
+      };
+      var btns = {
+        all: document.getElementById('results-btn-all'),
+        each: document.getElementById('results-btn-each'),
+        cmp: document.getElementById('results-btn-cmp')
+      };
+      Object.keys(views).forEach(function (k) {
+        views[k].style.display = (k === which) ? '' : 'none';
+        if (k === which) btns[k].classList.add('is-outlined');
+        else btns[k].classList.remove('is-outlined');
+      });
+      var ev = document.getElementById('results-each-video');
+      var dv = document.getElementById('results-cmp-video-dinov3');
+      var ov = document.getElementById('results-cmp-video-ours');
+      if (which === 'each') {
+        if (!ev.src) { setEach(0); } else { ev.play(); }
+        dv.pause(); ov.pause();
+      } else if (which === 'cmp') {
+        if (!dv.src) { setCmp(0); } else { dv.play(); ov.play(); }
+        ev.pause();
+      } else {
+        ensureGridLoaded();
+        ev.pause(); dv.pause(); ov.pause();
+      }
+      Object.keys(btns).forEach(function (k) { btns[k].blur(); });
+    };
+  })();
+</script>
+<section class="hero teaser" style="margin-top:30px; margin-bottom:20px">
+  <div class="container is-max-desktop">
+    <div style="background:#fafafa; border:2px solid #ddd; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+      <div style="background:#495057; color:#ffffff; padding:12px 15px; border-radius:8px; text-align:center; font-weight:bold; font-size:1.4em; margin-bottom:15px">In-the-Wild Floorplan Localization Results</div>
+      <p style="text-align:center; color:#495057; line-height:1.6; margin:0 auto 18px auto;">
+        We show localization results on the C3 dataset, with one random sample per scene. We visualize correspondences (photo &#x2194; density map &#x2194; floorplan) estimated by <span style="color:#8E63AE; font-weight:bold">Ours</span>, and the camera poses estimated by <span style="color:#8E63AE; font-weight:bold">Ours</span>, <span style="color:#F4B41A; font-weight:bold">C3Po</span>, <span style="color:#B86A2B; font-weight:bold">DUSt3R</span>, and <span style="color:#4DB6AC; font-weight:bold">LoFTR</span>, alongside <span style="color:rgb(255,0,0); font-weight:bold">Ground Truth</span>.
+      </p>
+      <div style="display:flex; gap:20px; align-items:flex-start; justify-content:center; border:2px solid #d0d0d0; border-radius:10px; padding:15px; background:#ffffff; margin-bottom:18px;">
+        <figure style="margin:0; flex:0 1 auto; min-width:0; text-align:center">
+          <img id="loc-img-pose" alt="" style="display:block; max-height:200px; max-width:100%; height:auto; width:auto; border:1px solid #ccc; border-radius:8px; background:#fff">
+          <figcaption style="font-weight:bold; font-size:1.1em; margin-top:10px; color:#495057">Image</figcaption>
+        </figure>
+        <figure style="margin:0; flex:0 1 auto; min-width:0; text-align:center">
+          <img id="loc-img-floorplan" alt="" style="display:block; max-height:200px; max-width:100%; height:auto; width:auto; border:1px solid #ccc; border-radius:8px; background:#fff">
+          <figcaption style="font-weight:bold; font-size:1.1em; margin-top:10px; color:#495057">Floorplan</figcaption>
+        </figure>
+      </div>
+      <div style="border:2px solid #d0d0d0; border-radius:10px; padding:15px; background:#ffffff; margin-bottom:0;">
+        <div class="qe-legend" style="margin-top:0px; margin-bottom:8px">
+          <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#4DB6AC"></span><span style="color:#4DB6AC; font-weight:bold">LoFTR</span></span>
+          <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#B86A2B"></span><span style="color:#B86A2B; font-weight:bold">DUSt3R</span></span>
+          <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#F4B41A"></span><span style="color:#F4B41A; font-weight:bold">C3Po</span></span>
+          <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#8E63AE"></span><span style="color:#8E63AE; font-weight:bold">Ours</span></span>
+          <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:rgb(255,0,0)"></span><span style="color:rgb(255,0,0); font-weight:bold">GT</span></span>
+        </div>
+        <div style="display:flex; gap:20px; align-items:flex-start; justify-content:center;">
+          <figure style="margin:0; flex:0 1 auto; min-width:0; text-align:center">
+            <img id="loc-img-triple" alt="" style="display:block; max-height:200px; max-width:100%; height:auto; width:auto; border:1px solid #ccc; border-radius:8px; background:#fff">
+            <figcaption style="font-weight:bold; font-size:1.1em; margin-top:10px; color:#495057">Correspondence (<span style="color:#8E63AE">Ours</span>)</figcaption>
+          </figure>
+          <figure style="margin:0; flex:0 1 auto; min-width:0; text-align:center">
+            <img id="loc-img-posepred" alt="" style="display:block; max-height:200px; max-width:100%; height:auto; width:auto; border:1px solid #ccc; border-radius:8px; background:#fff">
+            <figcaption style="font-weight:bold; font-size:1.1em; margin-top:10px; color:#495057">Camera Pose (All)</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div id="loc-scene" style="text-align:center; color:#495057; font-size:1.1em; margin-top:14px"><span style="color:#8a8f94; font-weight:600">|&nbsp;Scene&nbsp;|&nbsp;</span><b>Abbaye de Chaalis - Abbatiale</b></div>
+      <div style="margin-top:14px; display:flex; align-items:center; justify-content:center; gap:18px;">
+        <button class="button is-rounded is-dark"
+                onclick="locStep(-1)" aria-label="Previous">
+          <span class="icon"><i class="fas fa-caret-left"></i></span>
+        </button>
+        <span id="loc-counter" style="font-size:1.1rem; min-width:80px; text-align:center">1 / 111</span>
+        <button class="button is-rounded is-dark"
+                onclick="locStep(1)" aria-label="Next">
+          <span class="icon"><i class="fas fa-caret-right"></i></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  (function () {
+    var EXAMPLES = [
+      {u:"93024",s:"S014-E-F1"},
+      {u:"93011",s:"S013-E-F3"},
+      {u:"92891",s:"S003-E-F1"},
+      {u:"93150",s:"S028-E-F1"},
+      {u:"93333",s:"S029-E-F1"},
+      {u:"93416",s:"S038-I-F1"},
+      {u:"93519",s:"S047-I-F1"},
+      {u:"93585",s:"S057-E-F1"},
+      {u:"95449",s:"S068-E-F3"},
+      {u:"96259",s:"S081-E-F1"},
+      {u:"96368",s:"S085-I-F1"},
+      {u:"96471",s:"S086-E-F1"},
+      {u:"97037",s:"S088-I-F1"},
+      {u:"98470",s:"S094-E-F1"},
+      {u:"98493",s:"S095-I-F1"},
+      {u:"98566",s:"S110-E-F1"},
+      {u:"98586",s:"S116-E-F1"},
+      {u:"98620",s:"S119-E-F1"},
+      {u:"98698",s:"S121-E-F1"},
+      {u:"98834",s:"S122-E-F1"},
+      {u:"99035",s:"S123-I-F1"},
+      {u:"99082",s:"S125-E-F1"},
+      {u:"99104",s:"S137-E-F1"},
+      {u:"99139",s:"S139-E-F1"},
+      {u:"99181",s:"S141-E-F1"},
+      {u:"99193",s:"S143-E-F1"},
+      {u:"99255",s:"S150-E-F1"},
+      {u:"99290",s:"S152-E-F1"},
+      {u:"99334",s:"S162-E-F1"},
+      {u:"99458",s:"S164-E-F1"},
+      {u:"99575",s:"S167-E-F1"},
+      {u:"99579",s:"S168-E-F1"},
+      {u:"99596",s:"S173-I-F1"},
+      {u:"99986",s:"S183-I-F1"},
+      {u:"101354",s:"S184-E-F1"},
+      {u:"101375",s:"S186-E-F1"},
+      {u:"101418",s:"S189-E-F1"},
+      {u:"101431",s:"S204-I-F1"},
+      {u:"102821",s:"S208-E-F1"},
+      {u:"103134",s:"S211-I-F1"},
+      {u:"103356",s:"S220-I-F1"},
+      {u:"103394",s:"S221-I-F1"},
+      {u:"104149",s:"S231-E-F1"},
+      {u:"104616",s:"S237-I-F1"},
+      {u:"107964",s:"S256-E-F1"},
+      {u:"107982",s:"S258-E-F1"},
+      {u:"107985",s:"S259-E-F1"},
+      {u:"108003",s:"S260-I-F1"},
+      {u:"108019",s:"S262-E-F1"},
+      {u:"108076",s:"S263-E-F1"},
+      {u:"108144",s:"S265-E-F1"},
+      {u:"108192",s:"S279-E-F1"},
+      {u:"108231",s:"S291-E-F1"},
+      {u:"108289",s:"S294-I-F1"},
+      {u:"108365",s:"S300-I-F1"},
+      {u:"108387",s:"S302-E-F1"},
+      {u:"108396",s:"S303-E-F1"},
+      {u:"108440",s:"S310-E-F1"},
+      {u:"108556",s:"S315-I-F1"},
+      {u:"108609",s:"S323-E-F1"},
+      {u:"108616",s:"S324-E-F1"},
+      {u:"108860",s:"S333-E-F1"},
+      {u:"109441",s:"S334-I-F1"},
+      {u:"110603",s:"S343-I-F1"},
+      {u:"110617",s:"S350-E-F1"},
+      {u:"110772",s:"S356-E-F1"},
+      {u:"110813",s:"S358-I-F1"},
+      {u:"110841",s:"S365-E-F1"},
+      {u:"111152",s:"S366-E-F1"},
+      {u:"111228",s:"S374-I-F1"},
+      {u:"111285",s:"S375-I-F1"},
+      {u:"111622",s:"S377-E-F1"},
+      {u:"111965",s:"S378-E-F1"},
+      {u:"112007",s:"S382-E-F1"},
+      {u:"112155",s:"S386-E-F1"},
+      {u:"112168",s:"S396-E-F1"},
+      {u:"115286",s:"S397-E-F1"},
+      {u:"115405",s:"S403-I-F1"},
+      {u:"115429",s:"S407-I-F1"},
+      {u:"115492",s:"S419-E-F1"},
+      {u:"115548",s:"S422-E-F1"},
+      {u:"115810",s:"S425-I-F1"},
+      {u:"115881",s:"S428-E-F1"},
+      {u:"116717",s:"S434-I-F1"},
+      {u:"116774",s:"S443-I-F1"},
+      {u:"116799",s:"S448-E-F1"},
+      {u:"117391",s:"S460-E-F1"},
+      {u:"117546",s:"S480-E-F1"},
+      {u:"117578",s:"S486-I-F1"},
+      {u:"117647",s:"S490-E-F1"},
+      {u:"117935",s:"S496-I-F1"},
+      {u:"117940",s:"S498-E-F1"},
+      {u:"117946",s:"S500-E-F1"},
+      {u:"117959",s:"S501-E-F1"},
+      {u:"118093",s:"S503-I-F1"},
+      {u:"118254",s:"S507-E-F1"},
+      {u:"118355",s:"S511-E-F1"},
+      {u:"118453",s:"S518-E-F1"},
+      {u:"118507",s:"S520-E-F1"},
+      {u:"118685",s:"S522-E-F1"},
+      {u:"118884",s:"S526-E-F1"},
+      {u:"119062",s:"S528-E-F1"},
+      {u:"119447",s:"S541-E-F1"},
+      {u:"119524",s:"S545-E-F1"},
+      {u:"119558",s:"S550-E-F1"},
+      {u:"119596",s:"S561-E-F1"},
+      {u:"119829",s:"S564-I-F1"},
+      {u:"119864",s:"S570-E-F1"},
+      {u:"119881",s:"S577-E-F1"},
+      {u:"119889",s:"S579-I-F1"},
+      {u:"119990",s:"S580-I-F1"}
+    ];
+    var BASE = "static/images/localization_results/";
+    var imgs = {
+      pose:      document.getElementById('loc-img-pose'),
+      floorplan: document.getElementById('loc-img-floorplan'),
+      triple:    document.getElementById('loc-img-triple'),
+      posepred:  document.getElementById('loc-img-posepred')
+    };
+    function srcs(e) {
+      return {
+        pose:      BASE + "image/"     + e.s + "_" + e.u + "_img.png",
+        floorplan: BASE + "floorplan/" + e.s + "_floorplan.png",
+        triple:    BASE + "corr/"      + e.s + "_" + e.u + "_corr.png",
+        posepred:  BASE + "pose/"      + e.s + "_" + e.u + "_pose.png"
+      };
+    }
+    function preload(i) {
+      if (i < 0 || i >= EXAMPLES.length) return;
+      var s = srcs(EXAMPLES[i]);
+      for (var k in s) { var im = new Image(); im.src = s[k]; }
+    }
+    var idx = 0;
+    function render(i) {
+      idx = (i + EXAMPLES.length) % EXAMPLES.length;
+      var e = EXAMPLES[idx];
+      var s = srcs(e);
+      for (var k in s) imgs[k].src = s[k];
+      document.getElementById('loc-counter').textContent = (idx + 1) + ' / ' + EXAMPLES.length;
+      document.getElementById('loc-scene').innerHTML = window.sceneCaptionHTML(e.s);
+      preload(idx + 1);
+      preload(idx - 1);
+    }
+    window.locStep = function (d) {
+      render(idx + d);
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    };
+    render(0);
+  })();
+</script>
+<br>
+
+<style>
+  .qe-legend { display:flex; flex-wrap:wrap; justify-content:center; gap:8px 18px; margin-bottom:6px; }
+  .qe-legend-item { display:flex; align-items:center; gap:6px; font-size:0.92em; color:#495057; font-weight:600; }
+  .qe-legend-swatch { width:14px; height:14px; border-radius:3px; display:inline-block; }
+  .qe-panel-title { text-align:center; font-weight:bold; font-size:1.15em; color:#495057; margin:20px 0 10px; }
+  .qe-panel-grid { display:flex; gap:18px; justify-content:center; flex-wrap:wrap; }
+  .qe-card { flex:1 1 0; min-width:220px; background:#ffffff; border:1px solid #e2e2e2; border-radius:10px; padding:14px 14px 10px; }
+  .qe-plot { position:relative; height:180px; margin:4px 4px 0; }
+  .qe-gridline { position:absolute; left:0; right:0; border-top:1px dashed #e3e3e3; }
+  .qe-bars { position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:space-around; gap:6px; }
+  .qe-bar-wrap { flex:1 1 0; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; }
+  .qe-bar-val { font-size:0.78em; font-weight:600; color:#495057; margin-bottom:3px; opacity:0; transition:opacity .4s ease .35s; white-space:nowrap; }
+  .qe-bar { width:100%; max-width:34px; height:0; border-radius:4px 4px 0 0; transition:height .9s cubic-bezier(.22,1,.36,1); }
+  .qe-bar.qe-ours { box-shadow:0 0 0 2px rgba(142,99,174,.35); }
+  .qe-visible .qe-bar { height:var(--h); }
+  .qe-visible .qe-bar-val { opacity:1; }
+  .qe-card-name { text-align:center; font-weight:bold; font-size:0.95em; color:#495057; margin-top:10px; }
+  @media (max-width:768px){ .qe-panel-grid{ flex-direction:column; } .qe-card{ min-width:0; } }
+  @media (prefers-reduced-motion: reduce){ .qe-bar,.qe-bar-val{ transition:none; } }
+</style>
+<section class="hero teaser" style="margin-top:10px; margin-bottom:20px">
+  <div class="container is-max-desktop">
+    <div style="background:#fafafa; border:2px solid #ddd; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+      <div style="background:#495057; color:#ffffff; padding:12px 15px; border-radius:8px; text-align:center; font-weight:bold; font-size:1.4em; margin-bottom:15px">Quantitative Evaluation on In-the-Wild Data</div>
+      <p style="text-align:center; color:#495057; line-height:1.6; margin:0 auto 16px auto;">
+        We evaluate camera pose and cross-modal correspondence estimation on the C3 dataset. Our fine-tuning scheme substantially improves the 2D foundation model (<span style="color:#9AA0A6; font-weight:bold">DINOv3</span>). <span style="color:#8E63AE; font-weight:bold">Ours</span> outperforms <span style="color:#4DB6AC; font-weight:bold">LoFTR</span>, <span style="color:#B86A2B; font-weight:bold">DUSt3R</span>, and <span style="color:#F4B41A; font-weight:bold">C3Po</span> by a large margin across all evaluation metrics.
+      </p>
+      <div class="qe-legend">
+        <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#4DB6AC"></span><span style="color:#4DB6AC; font-weight:bold">LoFTR</span></span>
+        <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#B86A2B"></span><span style="color:#B86A2B; font-weight:bold">DUSt3R</span></span>
+        <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#F4B41A"></span><span style="color:#F4B41A; font-weight:bold">C3Po</span></span>
+        <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#9AA0A6"></span><span style="color:#9AA0A6; font-weight:bold">DINOv3</span></span>
+        <span class="qe-legend-item"><span class="qe-legend-swatch" style="background:#8E63AE"></span><span style="color:#8E63AE; font-weight:bold">Ours</span></span>
+      </div>
+      <div id="qe-root"></div>
+    </div>
+  </div>
+</section>
+<script>
+  (function () {
+    var METHODS = [
+      { name: "LoFTR",  color: "#4DB6AC" },
+      { name: "DUSt3R", color: "#B86A2B" },
+      { name: "C3Po",   color: "#F4B41A" },
+      { name: "DINOv3", color: "#9AA0A6" },
+      { name: "Ours",   color: "#8E63AE", ours: true }
+    ];
+    var PANELS = [
+      { title: "Camera Pose Estimation", cards: [
+        { name: "Angular Recall @ 5°",       vals: [4.67, 5.14, 24.45, 14.25, 65.91] },
+        { name: "Positional Recall @ 5%",         vals: [1.09, 1.54, 16.60, 6.75, 50.87] },
+        { name: "Ang. & Pos. @ (30°, 20%)",  vals: [3.07, 4.64, 32.96, 18.28, 73.58] }
+      ]},
+      { title: "Correspondence Estimation", cards: [
+        { name: "PCK @ 5%",  vals: [2.49, 2.10, 34.91, 7.95, 69.87] },
+        { name: "PCK @ 10%", vals: [7.40, 7.69, 45.83, 16.25, 79.94] },
+        { name: "PCK @ 30%", vals: [37.13, 40.20, 72.25, 47.01, 90.45] }
+      ]}
+    ];
+    var AXIS_MAX = 100;
+    var root = document.getElementById("qe-root");
+    if (!root) return;
+
+    var html = "";
+    PANELS.forEach(function (panel) {
+      html += '<div class="qe-panel-title">' + panel.title + "</div>";
+      html += '<div class="qe-panel-grid">';
+      panel.cards.forEach(function (card) {
+        html += '<div class="qe-card"><div class="qe-plot">';
+        [0, 50, 100].forEach(function (g) {
+          html += '<div class="qe-gridline" style="bottom:' + g + '%"></div>';
+        });
+        html += '<div class="qe-bars">';
+        METHODS.forEach(function (m, i) {
+          var v = card.vals[i];
+          var h = Math.max(0, Math.min(100, (v / AXIS_MAX) * 100));
+          html +=
+            '<div class="qe-bar-wrap">' +
+              '<span class="qe-bar-val"' + (m.ours ? ' style="color:#8E63AE"' : "") + ">" + v.toFixed(2) + "</span>" +
+              '<div class="qe-bar' + (m.ours ? " qe-ours" : "") +
+                '" style="--h:' + h.toFixed(2) + "%; background:" + m.color +
+                '" title="' + m.name + ": " + v.toFixed(2) + '"></div>' +
+            "</div>";
+        });
+        html += "</div></div>";
+        html += '<div class="qe-card-name">' + card.name + "</div></div>";
+      });
+      html += "</div>";
+    });
+    root.innerHTML = html;
+
+    var show = function () { root.classList.add("qe-visible"); };
+    if ("IntersectionObserver" in window) {
+      var obs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { show(); obs.disconnect(); }
+        });
+      }, { threshold: 0.15 });
+      obs.observe(root);
+    } else {
+      show();
+    }
+  })();
+</script>
+
+<hr>
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered" style="margin-top:-5px">Applications</h2>
+    <div class="content has-text-justified">
+      <p>
+        Using the floorplan as a shared geometric bridge, our approach enables separate reconstructions to be registered into a common coordinate system even when direct 3D alignment is not possible. Two such challenging examples are provided below.
+      </p>
+    </div>
+  </div>
+</section>
+<section class="hero teaser" style="margin-top:20px">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/Figure7.png" class="center-img"/>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="content has-text-justified" style="margin-top:-22px">
+      <p style="margin-top:20px">
+        <b>Alignment of interior and exterior 3D scenes</b>, registered despite minimal visual overlap and large viewpoint differences between indoor and outdoor environments.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="container is-max-desktop">
+  <div class="buttons is-centered" style="margin-top:18px; margin-bottom:0">
+    <button id="app-ie-btn-sources"
+            class="button is-normal is-rounded is-dark"
+            onclick="appToggle('ie','sources')">
+      <span class="icon"><i class="fas fa-play"></i></span>
+      <span>Interior/Exterior 3D Scenes</span>
+    </button>
+    <button id="app-ie-btn-aligned"
+            class="button is-normal is-rounded is-dark"
+            onclick="appToggle('ie','aligned')">
+      <span class="icon"><i class="fas fa-play"></i></span>
+      <span>Aligned 3D Scene</span>
+    </button>
+  </div>
+</div>
+<section id="app-ie-sources" class="hero teaser" style="margin-top:20px; display:none">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <div style="display:flex; gap:16px">
+        <div style="flex:1; min-width:0; text-align:center">
+          <video src="static/videos/source/applications/interior_exterior/exterior.mp4"
+                 loop muted playsinline
+                 style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+          <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">Exterior</span>
+        </div>
+        <div style="flex:1; min-width:0; text-align:center">
+          <video src="static/videos/source/applications/interior_exterior/interior.mp4"
+                 loop muted playsinline
+                 style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+          <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">Interior</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="app-ie-aligned" class="hero teaser" style="margin-top:20px; display:none">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <div style="display:flex; gap:16px">
+        <div style="flex:1; min-width:0; text-align:center">
+          <video src="static/videos/source/applications/interior_exterior/aligned.mp4"
+                 loop muted playsinline
+                 style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+          <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">With Floorplan</span>
+        </div>
+        <div style="flex:1; min-width:0; text-align:center">
+          <video src="static/videos/source/applications/interior_exterior/aligned_no_floorplan.mp4"
+                 loop muted playsinline
+                 style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+          <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">Without Floorplan</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<br>
+<section class="hero teaser" style="margin-top:30px">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/FigureH2.png" class="center-img"/>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="content has-text-justified" style="margin-top:-22px">
+      <p style="margin-top:20px">
+        <b>Alignment of disjoint 3D scenes</b>, registered from disjoint image collections with no visual overlap.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="container is-max-desktop">
+  <div class="buttons is-centered" style="margin-top:18px; margin-bottom:0">
+    <button id="app-dj-btn-sources"
+            class="button is-normal is-rounded is-dark"
+            onclick="appToggle('dj','sources')">
+      <span class="icon"><i class="fas fa-play"></i></span>
+      <span>Disjoint 3D Scenes</span>
+    </button>
+    <button id="app-dj-btn-aligned"
+            class="button is-normal is-rounded is-dark"
+            onclick="appToggle('dj','aligned')">
+      <span class="icon"><i class="fas fa-play"></i></span>
+      <span>Aligned 3D Scene</span>
+    </button>
+  </div>
+</div>
+<section id="app-dj-sources" class="hero teaser" style="margin-top:20px; display:none">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <div style="display:flex; gap:16px">
+        <div style="flex:1; min-width:0; text-align:center">
+          <video src="static/videos/source/applications/disjoint/disjoint_1.mp4"
+                 loop muted playsinline
+                 style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+          <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">Disjoint (i)</span>
+        </div>
+        <div style="flex:1; min-width:0; text-align:center">
+          <video src="static/videos/source/applications/disjoint/disjoint_2.mp4"
+                 loop muted playsinline
+                 style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+          <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">Disjoint (ii)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="app-dj-aligned" class="hero teaser" style="margin-top:20px; display:none">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <div style="display:flex; gap:16px">
+        <div style="flex:1; min-width:0; text-align:center">
+          <video src="static/videos/source/applications/disjoint/aligned.mp4"
+                 loop muted playsinline
+                 style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+          <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">With Floorplan</span>
+        </div>
+        <div style="flex:1; min-width:0; text-align:center">
+          <video src="static/videos/source/applications/disjoint/aligned_no_floorplan.mp4"
+                 loop muted playsinline
+                 style="width:100%; border:1px solid #ccc; border-radius:8px; background:#000"></video>
+          <span style="display:block; font-weight:bold; font-size:1em; margin-top:8px; color:#495057">Without Floorplan</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  (function () {
+    var groups = {
+      ie: { keys: ['sources', 'aligned'], active: null },
+      dj: { keys: ['sources', 'aligned'], active: null }
+    };
+    function vids(el) { return el ? el.querySelectorAll('video') : []; }
+    function panel(g, k) { return document.getElementById('app-' + g + '-' + k); }
+    function btn(g, k)   { return document.getElementById('app-' + g + '-btn-' + k); }
+    window.appToggle = function (group, key) {
+      var g = groups[group]; if (!g) return;
+      var cur = g.active;
+      if (cur) {
+        var p = panel(group, cur); if (p) { p.style.display = 'none'; vids(p).forEach(function (v) { v.pause(); }); }
+        var b = btn(group, cur);   if (b) b.classList.remove('is-outlined');
+      }
+      if (cur === key) {
+        g.active = null;
+      } else {
+        var np = panel(group, key);
+        if (np) {
+          np.style.display = '';
+          vids(np).forEach(function (v) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () {}); });
+        }
+        var nb = btn(group, key); if (nb) nb.classList.add('is-outlined');
+        g.active = key;
+      }
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    };
+  })();
+</script>
+
+
+<hr>
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>TBD</code></pre>
+  </div>
+</section>
+<br><br>
+
+<footer class="footer">
+  <div class="container is-max-desktop">
+    <div class="content has-text-centered">
+      <a class="icon-link"
+         href="https://arxiv.org/abs/...">
+        <i class="ai ai-arxiv"></i>
+      </a>
+      <a class="icon-link" href="https://github.com/Cornell-VAILab" class="external-link">
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-12">
+        <div class="content">
+          <p>
+            This website is licensed under a <a rel="license"
+                                                href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+          <p>
+            This website template was adapted from <a href="https://nerfies.github.io/">Nerfies website</a>. 
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
