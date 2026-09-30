@@ -1,0 +1,10 @@
+numpy==2.3.5
+pillow==11.3.0
+opencv-python==4.13.0.90
+safetensors
+peft==0.18.1
+huggingface_hub
+viser==1.1.1
+pi3 @ git+https://github.com/yyfz/Pi3.git@6acdeb033d337e90b9df7a77b0c8929231083f16
+geocalib @ git+https://github.com/cvg/GeoCalib.git@3ee7ec3411160fea5f3ac32377e53137e9119824
+dinov3 @ git+https://github.com/facebookresearch/dinov3.git@83318a8767dc346d5e11a70521860e0da2e1099b
