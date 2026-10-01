@@ -124,6 +124,24 @@
   </div>
 </section>
 
+<hr>
+<section class="section">
+  <div class="container is-max-desktop">
+    <video id="intro-video" src="static/videos/SceneAligner_teaser.mp4" muted playsinline controls preload="metadata"
+            style="display:block; width:100%; max-width:600px; margin:0 auto; border:1px solid #ccc; border-radius:8px"></video>
+  </div>
+</section>
+<script>
+  (function () {
+    var v = document.getElementById('intro-video');
+    if (!('IntersectionObserver' in window)) { v.play(); return; }
+    var io = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) { v.play(); io.disconnect(); }
+    }, { threshold: 0.5 });
+    io.observe(v);
+  })();
+</script>
+<br>
 
 <hr>
 <section class="section">
