@@ -2,6 +2,7 @@
 
     python -m scenealigner.viewer outputs/S221                           # interactive
     python -m scenealigner.viewer outputs/S221 --render first_frame.png  # image of the first-frame view
+    python -m scenealigner.viewer outputs/S221 --render view.png --angle 90  # ... after a quarter turn of the turntable
 """
 import argparse
 import glob
@@ -70,9 +71,9 @@ def show(scenes, plan_img, port=8080):
     return server
 
 
-def render(server, path, width=1280, height=720):
-    """Saves an image of the first-frame view, rendered by a headless browser (Playwright) if installed, or else by
-    the first browser that opens the viewer."""
+def render(server, path, angle=0.0, width=1280, height=720):
+    """Saves an image of the first-frame view, turned by angle (degrees) as by the turntable. It is rendered by a
+    headless browser (Playwright) if installed, or else by the first browser that opens the viewer."""
     url = f"http://localhost:{server.get_port()}"
     try:
         from playwright.sync_api import sync_playwright
@@ -87,13 +88,15 @@ def render(server, path, width=1280, height=720):
     client = next(iter(server.get_clients().values()))
     time.sleep(3.0)  # scene transfer to the browser
 
-    forward = np.array(LOOK_AT) - POSITION
+    turn = rotation_z(np.deg2rad(angle))
+    position, look_at = turn @ POSITION, turn @ LOOK_AT
+    forward = look_at - position
     forward /= np.linalg.norm(forward)
     right = np.cross(forward, (0.0, 0.0, 1.0))
     right /= np.linalg.norm(right)
     rotation = np.stack([right, np.cross(forward, right), forward], axis=1)  # camera axes: right, down, forward
     image = client.get_render(height=height, width=width, wxyz=vtf.SO3.from_matrix(rotation).wxyz,
-                              position=POSITION, fov=FOV, transport_format="png").astype(np.float32)
+                              position=position, fov=FOV, transport_format="png").astype(np.float32)
     alpha = image[..., 3:] / 255
     Image.fromarray((image[..., :3] * alpha + 255 * (1 - alpha)).astype(np.uint8)).save(path)
     if playwright is not None:
@@ -111,12 +114,13 @@ if __name__ == "__main__":
     parser.add_argument("directory", help="output directory of demo.py")
     parser.add_argument("--port", type=int, default=8080)
     parser.add_argument("--render", default=None, help="saves an image of the first-frame view and exits")
+    parser.add_argument("--angle", type=float, default=0.0, help="turntable angle of the rendered view (degrees)")
     parser.add_argument("--share", action="store_true", help="also serves the viewer at a public viser share URL (24 hours)")
     args = parser.parse_args()
 
     server = show(*load(args.directory), port=args.port)
     if args.render:
-        render(server, args.render)
+        render(server, args.render, args.angle)
     else:
         if args.share:
             server.request_share_url()
