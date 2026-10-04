@@ -2,3 +2,17 @@ __pycache__/
 *.py[cod]
 outputs/
 .DS_Store
+.env
+.env.*
+.venv/
+venv/
+*.pem
+*.key
+*.pth
+*.pt
+*.ckpt
+*.bin
+*.safetensors
+*.npz
+*.npy
+*.tar.gz
